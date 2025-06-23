@@ -35,7 +35,8 @@ async function loadRandomRecipe() {
   resultsContainer.innerHTML = "";
 
   try {
-    const response = await fetch("/recipes/random");
+    const response = await fetch(`https://api.spoonacular.com/recipes/random?apiKey=YOUR_API_KEY&number=10`)
+
     const recipes = await response.json();
 
     randomRecipeContainer.innerHTML = "";
