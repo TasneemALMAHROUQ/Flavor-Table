@@ -2,9 +2,7 @@
 
 **Flavor Table** is a delicious web app that allows users to explore, search, and save recipes based on ingredients using the Spoonacular API.
 
-## 🌐 Live Demo
 
-🔗 [Check the live site here](https://your-github-username.github.io/Flavor-Table)
 
 ## 📌 Features
 
@@ -33,5 +31,5 @@
 - **API**: [Spoonacular Recipe API](https://spoonacular.com/food-api)
 - **Environment Variables**: Managed securely with `dotenv`
 
-## 📁 Folder Structure
+
 
