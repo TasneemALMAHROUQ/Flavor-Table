@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Georgia&family=Segoe+UI&display=swap" rel="stylesheet">
+
+  <meta charset="UTF-8" />
+  <title>Random Recipe - Flavor Table</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<nav>
+  <div class="nav-container">
+    <div class="logo">Flavor Table</div>
+    <div class="nav-links">
+      <a href="index.html">Search</a>
+      <a href="randomRecipes.html">Random</a>
+      <a href="favorites.html">Favorites</a>
+    </div>
+  </div>
+</nav>
+<h1><span class="inline-bg">🎲 Random Recipe Generator</span></h1>
+
+
+  <button id="randomBtn">Get Random Recipe</button>
+
+  <div id="randomRecipeContainer"></div>
+
+  <script>
+  document.getElementById("randomBtn").addEventListener("click", async () => {
+    const container = document.getElementById("randomRecipeContainer");
+    container.innerHTML = "";
+
+    try {
+      const response = await fetch("/recipes/random");
+      const data = await response.json(); 
+
+      if (!Array.isArray(data) || data.length === 0) {
+        container.innerHTML = "<p>No recipes found.</p>";
+        return;
+      }
+
+      data.forEach((recipe) => {
+        const card = document.createElement("div");
+        card.className = "recipe-card";
+
+        card.innerHTML = `
+          <h3>${recipe.title}</h3>
+          <img src="${recipe.image}" alt="${recipe.title}" width="200">
+          <p><strong>Instructions:</strong> ${recipe.instructions || "No instructions available."}</p>
+          <p><strong>Ingredients:</strong> ${recipe.ingredients.join(", ")}</p>
+        `;
+
+        container.appendChild(card);
+      });
+    } catch (error) {
+      container.innerHTML = "<p>⚠️ Failed to fetch recipe. Please try again.</p>";
+      console.error("Error:", error);
+    }
+  });
+</script>
+
+
+</body>
+
+<footer>
+  <p>🍽️ Flavor Table &copy; 2025 - Made with ❤️ by Tasneem Almahrouq</p>
+</footer>
+
+</html>
