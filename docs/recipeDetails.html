@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Recipe Details - Flavor Table</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<nav>
+  <div class="nav-container">
+    <div class="logo">Flavor Table</div>
+    <div class="nav-links">
+      <a href="index.html">Search</a>
+      <a href="randomRecipes.html">Random</a>
+      <a href="favorites.html">Favorites</a>
+    </div>
+  </div>
+</nav>
+<h1><span class="inline-bg">🍽️ Recipe Details</span></h1>
+  <div id="recipeDetailsContainer"></div>
+
+  <script>
+   
+    const params = new URLSearchParams(window.location.search);
+    const recipeId = params.get("id");
+
+    async function loadRecipeDetails() {
+      const container = document.getElementById("recipeDetailsContainer");
+      container.innerHTML = "<p>Loading recipe details...</p>";
+
+      try {
+        const response = await fetch(`/recipes/${recipeId}`);
+        const data = await response.json();
+
+        const card = document.createElement("div");
+        card.className = "recipe-card";
+
+        card.innerHTML = `
+          <h3>${data.title}</h3>
+          <img src="${data.image}" alt="${data.title}" width="300">
+          <p><strong>Ready In:</strong> ${data.readyInMinutes} minutes</p>
+          <p><strong>Summary:</strong> ${data.summary}</p>
+        `;
+
+        container.innerHTML = "";
+        container.appendChild(card);
+      } catch (error) {
+        container.innerHTML = "<p>⚠️ Failed to fetch recipe details.</p>";
+        console.error(error);
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", loadRecipeDetails);
+  </script>
+</body>
+
+<footer>
+  <p>🍽️ Flavor Table &copy; 2025 - Made with ❤️ by Tasneem Almahrouq</p>
+</footer>
+</html>
+</html>
