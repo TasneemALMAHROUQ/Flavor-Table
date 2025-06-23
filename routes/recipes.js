@@ -3,7 +3,6 @@ const axios = require("axios");
 const router = express.Router();
 require("dotenv").config();
 
-
 router.get("/random", async (req, res) => {
   try {
     const apiKey = process.env.API_KEY;
@@ -13,7 +12,7 @@ router.get("/random", async (req, res) => {
       {
         params: {
           apiKey: apiKey,
-          number: 10,  
+          number: 10,
         },
       }
     );
@@ -34,7 +33,6 @@ router.get("/random", async (req, res) => {
     res.status(500).json({ error: "Failed to fetch random recipes" });
   }
 });
-
 
 router.get("/search", async (req, res) => {
   try {
@@ -72,7 +70,7 @@ router.get("/search", async (req, res) => {
   }
 });
 
-
+// تفاصيل وصفة بواسطة ID
 router.get("/:id", async (req, res) => {
   try {
     const apiKey = process.env.API_KEY;
@@ -90,13 +88,10 @@ router.get("/:id", async (req, res) => {
     const recipe = response.data;
 
     const simplified = {
-      id: recipe.id,
       title: recipe.title,
       image: recipe.image,
       summary: recipe.summary,
       readyInMinutes: recipe.readyInMinutes,
-      instructions: recipe.instructions || "No instructions provided.",
-      ingredients: recipe.extendedIngredients.map(ing => ing.original),
     };
 
     res.json(simplified);

@@ -1,9 +1,0 @@
-services:
-  - type: web
-    name: flavor-table-api
-    env: node
-    buildCommand: npm install
-    startCommand: node server.js
-    envVars:
-      - key: API_KEY
-        value: 786b7c8ab6104d48b0dde5a6fbaf60e2
