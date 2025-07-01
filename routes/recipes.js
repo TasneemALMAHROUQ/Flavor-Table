@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-// GET جميع الوصفات من قاعدة البيانات
+
 router.get("/all", async (req, res) => {
   try {
     const query = "SELECT * FROM recipes ORDER BY id DESC";
@@ -21,7 +21,7 @@ ingredients: typeof r.ingredients === "string" ? JSON.parse(r.ingredients) : r.i
   }
 });
 
-// GET وصفة حسب ID
+
 router.get('/all', async (req, res) => {
   try {
     const { rows } = await req.pool.query('SELECT * FROM recipes');
@@ -34,7 +34,6 @@ router.get('/all', async (req, res) => {
 
 
 
-// POST إضافة وصفة جديدة
 router.post("/", async (req, res) => {
   try {
     const { title, image, instructions, ingredients, readyin } = req.body;
@@ -64,7 +63,7 @@ router.post("/", async (req, res) => {
   }
 });
 
-// DELETE حذف وصفة حسب ID
+
 router.delete("/:id", async (req, res) => {
   try {
     const id = req.params.id;
@@ -82,7 +81,7 @@ router.delete("/:id", async (req, res) => {
   }
 });
 
-// PUT تحديث وصفة حسب ID
+
 router.put("/:id", async (req, res) => {
   try {
     const id = req.params.id;
