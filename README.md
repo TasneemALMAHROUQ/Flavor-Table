@@ -30,5 +30,21 @@
 - **Backend**: Node.js, Express.js, Axios
 - **API**: [Spoonacular Recipe API](https://spoonacular.com/food-api)
 - **Environment Variables**: Managed securely with `dotenv`
+# Flavor Table - API Tests
+
+## Postman API Screenshots
+
+### GET All Recipes
+![GET](./docs/GIT.png)
+
+### POST Add Recipe
+![POST](./docs/POST.png)
+
+### PUT Update Recipe
+![PUT](./docs/PUT.png)
+
+### DELETE Recipe
+![DELETE](./docs/DELETE.png)
+
 
 
