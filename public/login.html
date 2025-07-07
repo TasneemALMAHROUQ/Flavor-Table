@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Login</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<nav>
+  <div class="nav-container">
+    <div class="logo">Flavor Table</div>
+    <div class="nav-links">
+      <a href="index.html">Search</a>
+      <a href="randomRecipes.html">Random</a>
+      <a href="favorites.html">Favorites</a>
+      <a href="profile.html">Profile</a>
+      <a href="login.html">Login</a>
+      <a href="register.html">Register</a>
+     <a href="#" id="logoutBtn" style="display:none;">Logout</a>
+
+    </div>
+  </div>
+</nav>
+
+  <h2><span class="inline-bg">🔐 Login</span></h2>
+
+  <form id="loginForm">
+    <label>Email:</label>
+    <input type="email" id="email" required />
+
+    <label>Password:</label>
+    <input type="password" id="password" required />
+
+    <button type="submit">Login</button>
+  </form>
+
+  <script>
+    const loginForm = document.getElementById("loginForm");
+
+    loginForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value.trim();
+
+      try {
+        const res = await fetch("/api/auth/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password })
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+       
+          localStorage.setItem("token", data.token);
+
+         
+          window.location.href = "profile.html";
+        } else {
+          alert(data.error || "Login failed");
+        }
+      } catch (err) {
+        console.error(err);
+        alert("Error during login.");
+      }
+    });
+  </script>
+
+  <footer>
+    <p>🍽️ Flavor Table &copy; 2025 - Made with ❤️ by Tasneem Almahrouq</p>
+  </footer>
+</body>
+</html>

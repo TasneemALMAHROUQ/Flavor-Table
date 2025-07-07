@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Register - Flavor Table</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+ 
+<nav>
+  <div class="nav-container">
+    <div class="logo">Flavor Table</div>
+    <div class="nav-links">
+      <a href="index.html">Search</a>
+      <a href="randomRecipes.html">Random</a>
+      <a href="favorites.html">Favorites</a>
+      <a href="profile.html">Profile</a>
+      <a href="login.html">Login</a> <!-- ✅ رابط صفحة تسجيل الدخول -->
+    </div>
+  </div>
+</nav>
+
+
+  <h1><span class="inline-bg">📝 Create an Account</span></h1>
+  <div style="max-width: 400px; margin: 0 auto; background-color: rgba(255,255,255,0.9); padding: 20px; border-radius: 12px;">
+    <form id="registerForm">
+      <label>Username:</label><br />
+      <input type="text" id="username" required style="width:100%; padding:8px; margin-bottom:10px;"><br />
+
+      <label>Email:</label><br />
+      <input type="email" id="email" required style="width:100%; padding:8px; margin-bottom:10px;"><br />
+
+      <label>Password:</label><br />
+      <input type="password" id="password" required style="width:100%; padding:8px; margin-bottom:20px;"><br />
+
+      <button type="submit">Register</button>
+    </form>
+  </div>
+
+  <script>
+    document.getElementById('registerForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+
+      const username = document.getElementById('username').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ username, email, password })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        alert("Registration successful!");
+        localStorage.setItem('token', data.token);
+        window.location.href = 'profile.html';    
+      } else {
+        alert(data.error || "Registration failed.");
+      }
+    });
+  </script>
+
+  <footer>
+    <p>🍽️ Flavor Table &copy; 2025 - Made with ❤️ by Tasneem Almahrouq</p>
+  </footer>
+</body>
+</html>
