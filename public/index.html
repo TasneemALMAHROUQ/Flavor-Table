@@ -2,7 +2,6 @@
 <html lang="en">
 <head>
   <link href="https://fonts.googleapis.com/css2?family=Georgia&family=Segoe+UI&display=swap" rel="stylesheet">
-
   <meta charset="UTF-8" />
   <title>Flavor Table - Search Recipes</title>
   <link rel="stylesheet" href="styles.css">
@@ -16,23 +15,84 @@
       <a href="randomRecipes.html">Random</a>
       <a href="favorites.html">Favorites</a>
       <a href="profile.html">Profile</a>
-      <a href="login.html">Login</a> <!-- ✅ رابط صفحة تسجيل الدخول -->
+      <a href="login.html">Login</a> 
     </div>
   </div>
 </nav>
+
 <h1><span class="inline-bg">🔍 Search Recipes by Ingredients</span></h1>
-  <input type="text" id="ingredientInput" placeholder="e.g. chicken, rice, tomato" />
-  <button id="searchBtn">Search</button>
 
-  <div id="resultsContainer"></div>
-  <div id="randomRecipeContainer"></div>
+<input type="text" id="ingredientInput" placeholder="e.g. chicken, rice, tomato" />
+<button id="searchBtn">Search</button>
 
+<div id="resultsContainer"></div>
 
+<script>
+  const ingredientInput = document.getElementById('ingredientInput');
+  const searchBtn = document.getElementById('searchBtn');
+  const resultsContainer = document.getElementById('resultsContainer');
 
-  <script src="app.js"></script>
-</body>
+  async function fetchRecipes() {
+    try {
+      const response = await fetch('/api/recipes/all');
+      if (!response.ok) throw new Error('Failed to fetch recipes');
+      const recipes = await response.json();
+      return recipes;
+    } catch (error) {
+      console.error(error);
+      resultsContainer.innerHTML = '<p>Failed to load recipes.</p>';
+      return [];
+    }
+  }
+
+  function filterRecipesByIngredients(recipes, searchText) {
+    if (!searchText.trim()) return recipes; // لو البحث فاضي يرجع كل الوصفات
+
+    const searchIngredients = searchText.toLowerCase().split(',').map(s => s.trim()).filter(Boolean);
+
+    return recipes.filter(recipe => {
+      if (!Array.isArray(recipe.ingredients)) return false;
+      const lowerIngredients = recipe.ingredients.map(i => i.toLowerCase());
+      return searchIngredients.every(ing => lowerIngredients.includes(ing));
+    });
+  }
+
+  function displayRecipes(recipes) {
+    resultsContainer.innerHTML = '';
+    if (recipes.length === 0) {
+      resultsContainer.innerHTML = '<p>No recipes found.</p>';
+      return;
+    }
+
+    recipes.forEach(recipe => {
+      const div = document.createElement('div');
+      div.className = 'recipe-card';
+      div.innerHTML = `
+        <h3>${recipe.title}</h3>
+        <img src="${recipe.image || 'https://via.placeholder.com/200x150?text=No+Image'}" alt="${recipe.title}" />
+        <p><strong>Instructions:</strong> ${recipe.instructions || ''}</p>
+        <p><strong>Ingredients:</strong> ${Array.isArray(recipe.ingredients) ? recipe.ingredients.join(', ') : 'No ingredients listed'}</p>
+        <p><strong>Ready in:</strong> ${recipe.readyin || 'N/A'} minutes</p>
+      `;
+      resultsContainer.appendChild(div);
+    });
+  }
+
+  searchBtn.addEventListener('click', async () => {
+    const searchText = ingredientInput.value;
+    const recipes = await fetchRecipes();
+    const filtered = filterRecipesByIngredients(recipes, searchText);
+    displayRecipes(filtered);
+  });
+
+  window.addEventListener('load', async () => {
+    const recipes = await fetchRecipes();
+    displayRecipes(recipes);
+  });
+</script>
 
 <footer>
   <p>🍽️ Flavor Table &copy; 2025 - Made with ❤️ by Tasneem Almahrouq</p>
 </footer>
+</body>
 </html>

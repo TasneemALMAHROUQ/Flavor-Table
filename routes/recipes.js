@@ -99,4 +99,55 @@ router.put("/:id", async (req, res) => {
   }
 });
 
+
+router.get("/random", async (req, res) => {
+  try {
+    const query = `
+      SELECT * FROM recipes
+      ORDER BY RANDOM()
+      LIMIT 10;
+    `;
+    const result = await req.pool.query(query);
+
+    const recipes = result.rows.map(r => ({
+      ...r,
+      ingredients: typeof r.ingredients === "string" ? JSON.parse(r.ingredients) : r.ingredients,
+    }));
+
+    res.json(recipes);
+  } catch (err) {
+    console.error("Failed to fetch random recipes:", err);
+    res.status(500).json({ error: "Failed to fetch random recipes" });
+  }
+});
+// البحث عن وصفات باستخدام كلمة مفتاحية
+router.get("/search", async (req, res) => {
+  try {
+    const { q } = req.query;
+
+    if (!q) {
+      return res.status(400).json({ error: "Search query is required" });
+    }
+
+    const query = `
+      SELECT * FROM recipes
+      WHERE LOWER(title) LIKE LOWER($1)
+    `;
+    const values = [`%${q}%`];
+
+    const result = await req.pool.query(query, values);
+
+    const recipes = result.rows.map(r => ({
+      ...r,
+      ingredients: typeof r.ingredients === "string" ? JSON.parse(r.ingredients) : r.ingredients,
+    }));
+
+    res.json(recipes);
+  } catch (err) {
+    console.error("Failed to search recipes:", err);
+    res.status(500).json({ error: "Failed to search recipes" });
+  }
+});
+
+
 module.exports = router;
