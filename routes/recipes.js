@@ -8,8 +8,7 @@ router.get("/all", async (req, res) => {
     
     const recipes = result.rows.map(r => ({
       ...r,
-ingredients: typeof r.ingredients === "string" ? JSON.parse(r.ingredients) : r.ingredients,
-
+      ingredients: typeof r.ingredients === "string" ? JSON.parse(r.ingredients) : r.ingredients,
     }));
 
     res.json(recipes);
@@ -18,19 +17,6 @@ ingredients: typeof r.ingredients === "string" ? JSON.parse(r.ingredients) : r.i
     res.status(500).json({ error: "Failed to fetch recipes" });
   }
 });
-
-router.get('/all', async (req, res) => {
-  try {
-    const { rows } = await req.pool.query('SELECT * FROM recipes');
-    res.json(rows);
-  } catch (error) {
-    console.error('Failed to fetch recipes:', error);
-    res.status(500).json({ error: 'Failed to fetch recipes' });
-  }
-});
-
-
-
 
 router.post("/", async (req, res) => {
   try {
@@ -61,7 +47,6 @@ router.post("/", async (req, res) => {
   }
 });
 
-
 router.delete("/:id", async (req, res) => {
   try {
     const id = req.params.id;
@@ -78,7 +63,6 @@ router.delete("/:id", async (req, res) => {
     res.status(500).json({ error: "Failed to delete recipe" });
   }
 });
-
 
 router.put("/:id", async (req, res) => {
   try {
