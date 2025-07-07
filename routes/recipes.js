@@ -1,17 +1,14 @@
 const express = require("express");
 const router = express.Router();
 
-
 router.get("/all", async (req, res) => {
   try {
     const query = "SELECT * FROM recipes ORDER BY id DESC";
     const result = await req.pool.query(query);
     
-    // parse عمود ingredients من JSON نص إلى مصفوفة JS
     const recipes = result.rows.map(r => ({
       ...r,
-ingredients: typeof r.ingredients === "string" ? JSON.parse(r.ingredients) : r.ingredients,
-
+      ingredients: typeof r.ingredients === "string" ? JSON.parse(r.ingredients) : r.ingredients,
     }));
 
     res.json(recipes);
@@ -20,19 +17,6 @@ ingredients: typeof r.ingredients === "string" ? JSON.parse(r.ingredients) : r.i
     res.status(500).json({ error: "Failed to fetch recipes" });
   }
 });
-
-
-router.get('/all', async (req, res) => {
-  try {
-    const { rows } = await req.pool.query('SELECT * FROM recipes');
-    res.json(rows);
-  } catch (error) {
-    console.error('Failed to fetch recipes:', error);
-    res.status(500).json({ error: 'Failed to fetch recipes' });
-  }
-});
-
-
 
 router.post("/", async (req, res) => {
   try {
@@ -54,7 +38,7 @@ router.post("/", async (req, res) => {
     const result = await req.pool.query(query, values);
 
     const newRecipe = result.rows[0];
-    newRecipe.ingredients = ingredients; // أعد تحويله للمصفوفة
+    newRecipe.ingredients = ingredients; 
 
     res.status(201).json(newRecipe);
   } catch (err) {
@@ -62,7 +46,6 @@ router.post("/", async (req, res) => {
     res.status(500).json({ error: "Failed to add recipe" });
   }
 });
-
 
 router.delete("/:id", async (req, res) => {
   try {
@@ -80,7 +63,6 @@ router.delete("/:id", async (req, res) => {
     res.status(500).json({ error: "Failed to delete recipe" });
   }
 });
-
 
 router.put("/:id", async (req, res) => {
   try {
