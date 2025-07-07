@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>User Profile</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<nav>
+  <div class="nav-container">
+    <div class="logo">Flavor Table</div>
+    <div class="nav-links">
+      <a href="index.html">Search</a>
+      <a href="randomRecipes.html">Random</a>
+      <a href="favorites.html">Favorites</a>
+      <a href="profile.html">Profile</a>
+      <a href="login.html">Login</a> <!-- ✅ رابط صفحة تسجيل الدخول -->
+    </div>
+  </div>
+</nav>
+
+  <h2><span class="inline-bg">👤 User Profile</span></h2>
+
+  <div id="profileContent" style="background-color: rgba(255,255,255,0.85); padding: 20px; border-radius: 12px; max-width: 500px; margin: auto;">
+    <p><strong>Username:</strong> <span id="username">...</span></p>
+    <p><strong>Email:</strong> <span id="email">...</span></p>
+  </div>
+
+  <script>
+    async function loadProfile() {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        window.location.href = "login.html";
+        return;
+      }
+
+      try {
+        const res = await fetch("/api/users/profile", {
+          method: "GET",
+          headers: {
+            "Authorization": "Bearer " + token
+          }
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          alert(data.error || "Unauthorized");
+          window.location.href = "login.html";
+          return;
+        }
+
+        document.getElementById("username").textContent = data.username;
+        document.getElementById("email").textContent = data.email;
+
+      } catch (err) {
+        console.error("Error loading profile:", err);
+        alert("Error loading profile");
+        window.location.href = "login.html";
+      }
+    }
+
+    loadProfile();
+  </script>
+
+  <footer>
+    <p>🍽️ Flavor Table &copy; 2025 - Made with ❤️ by Tasneem Almahrouq</p>
+  </footer>
+</body>
+</html>

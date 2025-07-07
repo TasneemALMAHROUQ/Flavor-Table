@@ -2,9 +2,9 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Favorites - Flavor Table</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Favorites Recipes</title>
   <link rel="stylesheet" href="styles.css">
-  <link href="https://fonts.googleapis.com/css2?family=Georgia&family=Segoe+UI&display=swap" rel="stylesheet">
 </head>
 <body>
   <nav>
@@ -14,112 +14,154 @@
         <a href="index.html">Search</a>
         <a href="randomRecipes.html">Random</a>
         <a href="favorites.html">Favorites</a>
+        <a href="profile.html">Profile</a>
+        <a href="login.html">Login</a>
       </div>
     </div>
   </nav>
 
-  <h1><span class="inline-bg">💖 Favorite Recipes</span></h1>
-  <div id="favoritesContainer"></div>
-  <div id="recipesContainer"></div>
+  <h1>Favorite Recipes</h1>
+  <div id="recipes-container"></div>
+
+  <div id="update-form-container" style="display:none; margin-top: 20px;">
+    <h2>Update Recipe</h2>
+    <form id="updateForm">
+      <input type="hidden" id="update-id" />
+      <label>Title: <input type="text" id="update-title" required /></label><br /><br />
+      <label>Image URL: <input type="text" id="update-image" /></label><br /><br />
+      <label>Instructions:<br />
+        <textarea id="update-instructions" rows="4" cols="50"></textarea>
+      </label><br /><br />
+      <label>Ingredients (comma separated):<br />
+        <input type="text" id="update-ingredients" />
+      </label><br /><br />
+      <label>Ready in (minutes): <input type="number" id="update-readyin" min="1" /></label><br /><br />
+      <button type="submit">Save</button>
+      <button type="button" id="cancelUpdate">Cancel</button>
+    </form>
+  </div>
 
   <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const container = document.getElementById("favoritesContainer");
+    const container = document.getElementById('recipes-container');
+    const updateFormContainer = document.getElementById('update-form-container');
+    const updateForm = document.getElementById('updateForm');
+    let recipes = [];
 
-      fetch("/recipes/all")
-        .then((res) => res.json())
-        .then((recipes) => {
-          if (!recipes.length) {
-            container.innerHTML = "<p>No recipes found.</p>";
-            return;
-          }
+    function loadRecipes() {
+      const favoriteIds = JSON.parse(localStorage.getItem('favorites')) || [];
 
-          container.innerHTML = "";
-
-          recipes.forEach((recipe) => {
-            const card = document.createElement("div");
-            card.className = "recipe-card";
-
-            card.innerHTML = `
-              <h3>${recipe.title}</h3>
-              <img src="${recipe.image}" alt="${recipe.title}" width="200">
-              <p><strong>Instructions:</strong> ${recipe.instructions}</p>
-              <p><strong>Ingredients:</strong> ${recipe.ingredients.join(", ")}</p>
-              <p><strong>Ready In:</strong> ${recipe.readyin} minutes</p>
-              <button class="delete-btn" data-id="${recipe.id}">❌ Delete</button>
-              <button class="edit-btn" data-id="${recipe.id}">✏️ Edit</button>
-            `;
-
-           
-            card.querySelector(".delete-btn").addEventListener("click", async () => {
-              const confirmDelete = confirm("Are you sure you want to delete this recipe?");
-              if (!confirmDelete) return;
-
-              try {
-                const response = await fetch(`/recipes/${recipe.id}`, {
-                  method: "DELETE",
-                });
-
-                if (response.ok) {
-                  alert("Recipe deleted successfully.");
-                  card.remove();
-                } else {
-                  alert("Failed to delete recipe.");
-                }
-              } catch (err) {
-                console.error("❌ Error:", err);
-                alert("Error deleting recipe.");
-              }
-            });
-
-           
-            card.querySelector(".edit-btn").addEventListener("click", async () => {
-              const newTitle = prompt("Enter new title:", recipe.title);
-              const newInstructions = prompt("Enter new instructions:", recipe.instructions);
-              const newReadyIn = prompt("Enter new Ready In (minutes):", recipe.readyin);
-
-              if (!newTitle || !newInstructions || !newReadyIn) {
-                alert("All fields are required.");
-                return;
-              }
-
-              try {
-                const response = await fetch(`/recipes/${recipe.id}`, {
-                  method: "PUT",
-                  headers: {
-                    "Content-Type": "application/json",
-                  },
-                  body: JSON.stringify({
-                    title: newTitle,
-                    instructions: newInstructions,
-                    readyin: parseInt(newReadyIn),
-                  }),
-                });
-
-                if (response.ok) {
-                  alert("✅ Recipe updated!");
-                  location.reload();
-                } else {
-                  alert("❌ Failed to update recipe.");
-                }
-              } catch (err) {
-                console.error("❌ Error:", err);
-                alert("Error updating recipe.");
-              }
-            });
-
-            container.appendChild(card);
-          });
+      fetch('/api/recipes/all')
+        .then(res => res.json())
+        .then(data => {
+          recipes = data.filter(recipe => favoriteIds.includes(recipe.id));
+          displayRecipes();
         })
-        .catch((err) => {
-          container.innerHTML = "<p>Failed to load recipes.</p>";
-          console.error(err);
-        });
-    });
-  </script>
+        .catch(err => console.error('Error fetching recipes:', err));
+    }
 
-  <footer>
-    <p>🍽️ Flavor Table &copy; 2025 - Made with ❤️ by Tasneem Almahrouq</p>
-  </footer>
+    function displayRecipes() {
+      container.innerHTML = '';
+
+      if (recipes.length === 0) {
+        container.innerHTML = '<p>No favorite recipes found.</p>';
+        return;
+      }
+
+      recipes.forEach(recipe => {
+        const div = document.createElement('div');
+        div.className = 'recipe-card';
+
+        div.innerHTML = `
+          <h3>${recipe.title}</h3>
+          <img src="${recipe.image || 'https://via.placeholder.com/200x150?text=No+Image'}" alt="${recipe.title}" />
+          <p><strong>Instructions:</strong> ${recipe.instructions || ''}</p>
+          <p><strong>Ingredients:</strong> ${Array.isArray(recipe.ingredients) ? recipe.ingredients.join(', ') : 'No ingredients listed'}</p>
+          <p><strong>Ready in:</strong> ${recipe.readyin || 'N/A'} minutes</p>
+          <button data-id="${recipe.id}" class="edit-btn">Edit</button>
+          <button data-id="${recipe.id}" class="delete-btn">Delete</button>
+        `;
+
+        container.appendChild(div);
+      });
+
+      document.querySelectorAll('.edit-btn').forEach(button => {
+        button.addEventListener('click', () => {
+          const id = button.getAttribute('data-id');
+          openUpdateForm(id);
+        });
+      });
+
+      document.querySelectorAll('.delete-btn').forEach(button => {
+        button.addEventListener('click', () => {
+          const id = button.getAttribute('data-id');
+          if (confirm('Are you sure you want to delete this recipe?')) {
+            deleteRecipe(id);
+          }
+        });
+      });
+    }
+
+    function openUpdateForm(id) {
+      const recipe = recipes.find(r => r.id == id);
+      if (!recipe) return;
+
+      document.getElementById('update-id').value = recipe.id;
+      document.getElementById('update-title').value = recipe.title || '';
+      document.getElementById('update-image').value = recipe.image || '';
+      document.getElementById('update-instructions').value = recipe.instructions || '';
+      document.getElementById('update-ingredients').value = Array.isArray(recipe.ingredients) ? recipe.ingredients.join(', ') : '';
+      document.getElementById('update-readyin').value = recipe.readyin || '';
+
+      updateFormContainer.style.display = 'block';
+      window.scrollTo(0, updateFormContainer.offsetTop);
+    }
+
+    updateForm.addEventListener('submit', e => {
+      e.preventDefault();
+
+      const id = document.getElementById('update-id').value;
+      const updatedRecipe = {
+        title: document.getElementById('update-title').value.trim(),
+        image: document.getElementById('update-image').value.trim() || null,
+        instructions: document.getElementById('update-instructions').value.trim(),
+        ingredients: document.getElementById('update-ingredients').value.split(',').map(i => i.trim()).filter(i => i),
+        readyin: parseInt(document.getElementById('update-readyin').value) || 0,
+      };
+
+      fetch(`/api/recipes/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedRecipe),
+      })
+      .then(res => {
+        if (!res.ok) throw new Error('Failed to update recipe');
+        return res.json();
+      })
+      .then(data => {
+        alert('Recipe updated successfully!');
+        updateFormContainer.style.display = 'none';
+        loadRecipes();
+      })
+      .catch(err => alert('Error updating recipe: ' + err.message));
+    });
+
+    document.getElementById('cancelUpdate').addEventListener('click', () => {
+      updateFormContainer.style.display = 'none';
+    });
+
+    function deleteRecipe(id) {
+      fetch(`/api/recipes/${id}`, {
+        method: 'DELETE',
+      })
+      .then(res => {
+        if (!res.ok) throw new Error('Failed to delete recipe');
+        alert('Recipe deleted successfully!');
+        loadRecipes();
+      })
+      .catch(err => alert('Error deleting recipe: ' + err.message));
+    }
+
+    loadRecipes();
+  </script>
 </body>
 </html>

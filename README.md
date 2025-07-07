@@ -45,6 +45,12 @@
 
 ### DELETE Recipe
 ![DELETE](./docs/DELETE.png)
+### git user 
+![DELETE](./docs/gitp3.png)
+
+### post user
+![DELETE](./docs/postp3.png)
+
 
 
 

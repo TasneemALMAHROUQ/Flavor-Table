@@ -1,7 +1,12 @@
 document.addEventListener("DOMContentLoaded", () => {
   const container = document.getElementById("recipesContainer");
+  const token = localStorage.getItem("token");
 
-  fetch("/recipes/all")
+  fetch("/recipes/all", {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  })
     .then((res) => res.json())
     .then((recipes) => {
       if (recipes.length === 0) {
@@ -13,8 +18,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       recipes.forEach((recipe) => {
         const recipeDiv = document.createElement("div");
-    recipeDiv.classList.add("recipe-card");
-
+        recipeDiv.classList.add("recipe-card");
 
         recipeDiv.innerHTML = `
           <h2>${recipe.title}</h2>
@@ -28,8 +32,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         container.appendChild(recipeDiv);
       });
-
-     
     })
     .catch((err) => {
       container.innerHTML = "<p>Failed to load recipes.</p>";
